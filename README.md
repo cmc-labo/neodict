@@ -82,7 +82,7 @@ pip install neodict
 ### ソースからインストール
 
 ```bash
-git clone https://github.com/yourusername/neodict.git
+git clone https://github.com/cmc-labo/neodict.git
 cd neodict
 pip install -e .
 ```

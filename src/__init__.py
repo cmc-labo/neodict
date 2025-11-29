@@ -5,7 +5,7 @@ NEologdの後継として、ウェブから自動的に新語や固有表現を�
 次世代日本語辞書システム
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "NeoDict Contributors"
 __license__ = "MIT"
 

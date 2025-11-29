@@ -11,7 +11,7 @@
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/yourusername/neodict.git
+git clone https://github.com/cmc-labo/neodict.git
 cd neodict
 
 # 依存ライブラリをインストール
@@ -182,6 +182,6 @@ updater.update()
 
 - [詳細なドキュメント](./DOCUMENTATION.md) を参照
 - [開発に貢献](../CONTRIBUTING.md) する
-- [Issue](https://github.com/yourusername/neodict/issues) を報告
+- [Issue](https://github.com/cmc-labo/neodict/issues) を報告
 
 Happy Coding!

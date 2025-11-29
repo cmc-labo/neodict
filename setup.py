@@ -8,7 +8,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="neodict",
-    version="0.1.0",
+    version="0.1.1",
     author="NeoDict Contributors",
     author_email="neodict@example.com",
     description="自動更新型日本語新語辞書ライブラリ",
