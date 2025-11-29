@@ -14,7 +14,12 @@ setup(
     description="自動更新型日本語新語辞書ライブラリ",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/neodict",
+    url="https://github.com/cmc-labo/neodict",
+    project_urls={
+        "Bug Reports": "https://github.com/cmc-labo/neodict/issues",
+        "Source": "https://github.com/cmc-labo/neodict",
+        "Documentation": "https://github.com/cmc-labo/neodict#readme",
+    },
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     classifiers=[
