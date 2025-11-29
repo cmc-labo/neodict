@@ -1,0 +1,106 @@
+# NeoDict 設定ファイル
+
+# 更新設定
+update:
+  # 更新間隔(時間)
+  interval_hours: 24
+
+  # 自動更新を有効にするか
+  auto_update: true
+
+  # スケジュール(cron形式: 分 時 日 月 曜日)
+  schedule: "0 3 * * *"  # 毎日3時に更新
+
+  # 最小頻度(この値未満の語は辞書に追加しない)
+  min_frequency: 2
+
+# データソース
+sources:
+  # Wikipedia日本語版
+  wikipedia:
+    enabled: true
+    categories:
+      - "全般"
+      - "情報技術"
+      - "エンターテインメント"
+    recent_changes: true
+    limit: 100
+
+  # ニュースサイト
+  news:
+    enabled: true
+    sites:
+      - "nhk"
+      - "yahoo"
+    limit: 50
+
+  # Twitter/X (API キー必要)
+  twitter:
+    enabled: false
+    api_key: ""
+    api_secret: ""
+    bearer_token: ""
+
+# フィルタリング
+filter:
+  # 最小出現頻度
+  min_frequency: 3
+
+  # 最小文字数
+  min_length: 2
+
+  # 最大文字数
+  max_length: 20
+
+  # 除外パターン(正規表現)
+  exclude_patterns:
+    - "^[0-9]+$"           # 数字のみ
+    - "^[a-zA-Z]+$"        # アルファベットのみ(1語)
+    - "^ー+$"              # 長音符のみ
+    - "^[、。！？]+$"      # 記号のみ
+
+  # 除外カテゴリ
+  exclude_categories:
+    - "アダルト"
+    - "ギャンブル"
+
+# ストレージ
+storage:
+  # データベースファイルパス
+  database: "~/.neodict/dict.db"
+
+  # バックアップを有効にするか
+  backup_enabled: true
+
+  # バックアップ保持期間(日)
+  backup_keep_days: 30
+
+  # バックアップディレクトリ
+  backup_dir: "~/.neodict/backups"
+
+# クローラー設定
+crawler:
+  # リクエスト間の遅延(秒)
+  delay: 1.0
+
+  # タイムアウト(秒)
+  timeout: 10
+
+  # リトライ回数
+  max_retries: 3
+
+  # User-Agent
+  user_agent: "NeoDict/0.1.0 (Japanese Dictionary Crawler)"
+
+# ログ設定
+logging:
+  # ログレベル (DEBUG, INFO, WARNING, ERROR)
+  level: "INFO"
+
+  # ログファイルパス
+  file: "~/.neodict/neodict.log"
+
+  # ログのローテーション
+  rotate: true
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
