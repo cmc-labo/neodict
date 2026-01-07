@@ -93,6 +93,50 @@ class WordEntry:
             pronunciation
         ])
 
+    def to_sudachi_csv(self) -> str:
+        """Sudachi辞書形式のCSV行を生成"""
+        reading = self.word.reading or self.word.surface
+        # Sudachi 形式: 表層形,左文脈ID,右文脈ID,コスト,表層形,品詞1,品詞2,品詞3,品詞4,品詞5,品詞6,読み,正規化表記,辞書形ID,分割タイプ,A単位分割,B単位分割,未使用
+        # 簡易的に品詞4以降は * とする
+        return ",".join([
+            self.word.surface,
+            str(self.left_context_id),
+            str(self.right_context_id),
+            str(self.cost),
+            self.word.surface,
+            self.pos.value,
+            self.pos_detail1,
+            self.pos_detail2,
+            self.pos_detail3,
+            "*", # 品詞5
+            "*", # 品詞6
+            reading,
+            self.word.surface, # 正規化表記
+            "*", # 辞書形ID
+            "*", # 分割タイプ
+            "*", # A単位分割
+            "*", # B単位分割
+            "*"  # 未使用
+        ])
+
+    def to_janome_csv(self) -> str:
+        """Janome辞書形式のCSV行を生成"""
+        reading = self.word.reading or self.word.surface
+        pronunciation = self.word.pronunciation or reading
+        # Janome 形式: 表層形,品詞1,品詞2,品詞3,品詞4,活用型,活用形,原形,読み,発音
+        return ",".join([
+            self.word.surface,
+            self.pos.value,
+            self.pos_detail1,
+            self.pos_detail2,
+            self.pos_detail3,
+            self.conjugation_type,
+            self.conjugation_form,
+            self.base_form or self.word.surface,
+            reading,
+            pronunciation
+        ])
+
     def to_dict(self) -> dict:
         """辞書形式に変換"""
         return {

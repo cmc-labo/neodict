@@ -16,11 +16,15 @@ class WordExtractor:
         # カタカナ語のパターン
         self.katakana_pattern = re.compile(r'[ァ-ヴー]{2,}')
 
-        # 英数字混じりの語(例: ChatGPT, iPhone15)
-        self.alphanum_pattern = re.compile(r'[A-Za-z0-9][A-Za-z0-9ァ-ヴー]{1,}[A-Za-z0-9]')
+        # 英数字混じりの語(例: ChatGPT, iPhone15, GPT-4o, .NET)
+        # 記号(-や.)を含めつつ、英数字で始まるか、記号+英数字で始まるもの
+        self.alphanum_pattern = re.compile(r'[\.\-]?[A-Za-z0-9][A-Za-z0-9\.\-ァ-ヴー]*')
 
         # 固有名詞パターン(カタカナ+助詞の前)
         self.proper_noun_pattern = re.compile(r'([ァ-ヴー]{2,})(が|は|を|に|で|と|や|の)')
+
+        # 漢字の複合語(4文字以上)
+        self.kanji_compound_pattern = re.compile(r'[\u4e00-\u9faf]{4,}')
 
         # 除外パターン
         self.exclude_patterns = [
@@ -86,6 +90,25 @@ class WordExtractor:
 
         return words
 
+    def extract_kanji_compounds(self, text: str) -> Set[str]:
+        """
+        漢字の複合語を抽出
+
+        Args:
+            text: 入力テキスト
+
+        Returns:
+            抽出した漢字の集合
+        """
+        words = set()
+
+        for match in self.kanji_compound_pattern.finditer(text):
+            word = match.group(0)
+            if not self._should_exclude(word):
+                words.add(word)
+
+        return words
+
     def extract_all(self, text: str) -> Dict[str, Set[str]]:
         """
         全ての新語候補を抽出
@@ -99,7 +122,8 @@ class WordExtractor:
         return {
             "katakana": self.extract_katakana_words(text),
             "alphanum": self.extract_alphanum_words(text),
-            "proper_nouns": self.extract_proper_nouns(text)
+            "proper_nouns": self.extract_proper_nouns(text),
+            "kanji_compounds": self.extract_kanji_compounds(text)
         }
 
     def _should_exclude(self, word: str) -> bool:

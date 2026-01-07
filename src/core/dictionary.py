@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Optional, Dict
 from .word import WordEntry, Word, PartOfSpeech, WordSource
 from .storage import DictStorage
+import fugashi
 
 
 class NeoDict:
@@ -19,6 +20,10 @@ class NeoDict:
             db_path: データベースファイルのパス
         """
         self.storage = DictStorage(db_path)
+        try:
+            self.tagger = fugashi.Tagger()
+        except Exception:
+            self.tagger = None
 
     def add_word(
         self,
@@ -54,6 +59,31 @@ class NeoDict:
         )
 
         return self.storage.add_word(entry)
+
+    def suggest_reading(self, surface: str) -> Optional[str]:
+        """
+        単語の読みを推定
+
+        Args:
+            surface: 表層形
+
+        Returns:
+            推定された読み(カタカナ)
+        """
+        if not self.tagger:
+            return None
+
+        words = []
+        for word in self.tagger(surface):
+            # UniDic形式を想定 (2番目のフィールドが読み)
+            # 生データにアクセスするには word.feature
+            if word.feature.kana:
+                words.append(word.feature.kana)
+            else:
+                # 読みがない場合は表層形をそのまま利用(英数字等)
+                words.append(word.surface)
+
+        return "".join(words)
 
     def search(self, query: str, fuzzy: bool = False, limit: int = 100) -> List[Dict]:
         """
@@ -145,6 +175,46 @@ class NeoDict:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
         print(f"JSON辞書を出力しました: {output_path}")
+        print(f"総単語数: {len(entries)}")
+
+    def export_sudachi(self, output_path: str):
+        """
+        Sudachi形式で辞書をエクスポート
+
+        Args:
+            output_path: 出力先ディレクトリ
+        """
+        output_dir = Path(output_path)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        csv_path = output_dir / "neodict_sudachi.csv"
+        entries = self.storage.get_all_words()
+
+        with open(csv_path, "w", encoding="utf-8") as f:
+            for entry in entries:
+                f.write(entry.to_sudachi_csv() + "\n")
+
+        print(f"Sudachi辞書を出力しました: {csv_path}")
+        print(f"総単語数: {len(entries)}")
+
+    def export_janome(self, output_path: str):
+        """
+        Janome形式で辞書をエクスポート
+
+        Args:
+            output_path: 出力先ディレクトリ
+        """
+        output_dir = Path(output_path)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        csv_path = output_dir / "neodict_janome.csv"
+        entries = self.storage.get_all_words()
+
+        with open(csv_path, "w", encoding="utf-8") as f:
+            for entry in entries:
+                f.write(entry.to_janome_csv() + "\n")
+
+        print(f"Janome辞書を出力しました: {csv_path}")
         print(f"総単語数: {len(entries)}")
 
     def import_words(self, entries: List[WordEntry]) -> int:

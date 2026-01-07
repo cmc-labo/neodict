@@ -4,6 +4,7 @@ Wikipedia日本語版からのクローラー
 
 from typing import List, Dict, Optional
 import logging
+import re
 from .base import BaseCrawler
 from .extractor import WordExtractor
 
@@ -141,10 +142,23 @@ class WikipediaCrawler(BaseCrawler):
         extracted = self.extractor.extract_all(text)
 
         words = []
+        
+        # 記事タイトル自身の情報を追加(読みの抽出を試みる)
+        reading = self._extract_reading(text, title)
+        words.append({
+            "surface": title,
+            "reading": reading,
+            "source": "wikipedia",
+            "category": "article_title",
+            "frequency": text.count(title)
+        })
+
         for category, word_set in extracted.items():
             frequency = self.extractor.count_frequency(text, word_set)
 
             for word in word_set:
+                if word == title:
+                    continue
                 words.append({
                     "surface": word,
                     "source": "wikipedia",
@@ -153,6 +167,22 @@ class WikipediaCrawler(BaseCrawler):
                 })
 
         return words
+
+    def _extract_reading(self, text: str, title: str) -> Optional[str]:
+        """
+        テキスト(冒頭文)からタイトルの読みを抽出
+        例: "生成AI（せいせいエーアイ、英: Generative AI）は..." -> "せいせいエーアイ"
+        """
+        # タイトル直後の括弧を探す
+        # 括弧の種類: （）, (), []
+        pattern = re.compile(rf"{re.escape(title)}\s*[（\(\[]\s*([^）\)\],、\s]+)")
+        match = pattern.search(text)
+        if match:
+            reading = match.group(1)
+            # ひらがな、カタカナであることを確認
+            if re.match(r'^[ぁ-んァ-ヴー]+$', reading):
+                return reading
+        return None
 
     def get_trending_articles(self, limit: int = 50) -> List[str]:
         """
